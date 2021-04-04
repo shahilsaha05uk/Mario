@@ -1,0 +1,5 @@
+﻿  GameScreenLevel1.cpp
+X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\GameScreenLevel1.cpp(33,20): warning C4018: '<': signed/unsigned mismatch
+X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\GameScreenLevel1.cpp(213,20): warning C4018: '<': signed/unsigned mismatch
+X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\GameScreenLevel1.cpp(177): warning C4715: 'GameScreenLevel1::SetUpLevel': not all control paths return a value
+  Mario.vcxproj -> X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Debug\Mario.exe
