@@ -1,9 +1,9 @@
 #include "GameScreenLevel1.h"
-#include "Texture2D.h"
 #include <iostream>
-#include "SDL.h"
-#include "PowBlock.h"
-#include "Coins.h"
+#include "Texture2D.h"
+#include "Collision.h"
+
+
 using namespace std;
 GameScreenLevel1::GameScreenLevel1(SDL_Renderer* renderer) : GameScreen(renderer)
 {
@@ -16,47 +16,95 @@ GameScreenLevel1::GameScreenLevel1(SDL_Renderer* renderer) : GameScreen(renderer
 GameScreenLevel1::~GameScreenLevel1()
 {
 	m_background_texture = nullptr;
-	_mario = nullptr;
+
 	_luigi = nullptr;
-	delete[] _mario;
 	delete[] _luigi;
-	delete[] m_pow_block;
+
+	_mario = nullptr;
+	delete[] _mario;
+
 	m_pow_block = nullptr;
+	delete[] m_pow_block;
+
 	m_koopas.clear();
+
+	m_coins = nullptr;
 	delete[] m_coins;
+
+	_text = nullptr;
+	delete[] _text;
+
+	_luigi_healthText = nullptr;
+	delete[] _luigi_healthText;
 }
 
 void GameScreenLevel1::Render()
 {
+	_temprect = new SDL_Rect();
+	_temprect->x = 225; _temprect->y = 18;
+	_temprect->w = 80; _temprect->h = 80;
+	_text->Render(*_temprect, m_renderer);
 
-	m_background_texture->Render(Vector2D(0,m_background_yPos), SDL_FLIP_NONE);
+
+	marioHealthrect = new SDL_Rect();
+	marioHealthrect->h = 30.0f; marioHealthrect->w = 100.0f;
+	marioHealthrect->x = 10.0f; marioHealthrect->y = 10.0f;
+
+	luigiHealthrect = new SDL_Rect();
+	luigiHealthrect->h = 30.0f; luigiHealthrect->w = 100.0f;
+	luigiHealthrect->x = 400.0f; luigiHealthrect->y = 10.0f;
+
+
+	m_background_texture->Render(Vector2D(0, m_background_yPos), SDL_FLIP_NONE);
 	for (int i = 0; i < m_koopas.size(); i++)
 	{
 		m_koopas.at(i)->Render();
 	}
 	_luigi->Render();
 	_mario->Render();
-	m_coins->Render();
 	m_pow_block->Render();
+	for (int i = 0; i < _coins.size(); i++)
+	{
+		_coins.at(i)->Render();
+	}
+
+
+		//_mario_healthText->Render(*marioHealthrect, m_renderer);
+	if (_luigi->GetAlive() != false)
+	{
+		_luigi_healthText->Render(*luigiHealthrect, m_renderer);
+	}
 }
 
 void GameScreenLevel1::Update(float deltaTime, SDL_Event e)
 {
+	//scoretext->Update(e, deltaTime);
+
+
+	if (_mario->GetAlive() != false)
+	{
+		_mario_healthText->Update(to_string(mario_health));
+	}
+	if (_luigi->GetAlive() != false)
+	{
+		_luigi_healthText->Update(to_string(luigi_health));
+	}
+
 
 	UpdateEnemies(deltaTime, e);
 	_mario->Update(deltaTime, e);
 	_luigi->Update(deltaTime, e);
-	
 	UpdatePOWBlock();
-	m_coins->Update(deltaTime, e);
+	UpdateCoins(deltaTime, e);
+
 
 	if (Collision::Instance()->Circle(_mario, _luigi))
 	{
-		/*cout << "Circle Hit!" << endl;*/
+		//cout << "Circle Hit!" << endl;
 	}
 	if (Collision::Instance()->Box(_mario->GetCollisionBox(), _luigi->GetCollisionBox()))
 	{
-		/*cout << "Box Hit!" << endl;*/
+		//cout << "Box Hit!" << endl;
 	}
 	if (m_screenshake)
 	{
@@ -71,100 +119,32 @@ void GameScreenLevel1::Update(float deltaTime, SDL_Event e)
 			m_background_yPos = 0.0f;
 		}
 	}
-}
-void GameScreenLevel1::UpdateEnemies(float deltaTime, SDL_Event e)
-{
-	if (!m_koopas.empty())
-	{
-		int enemyToDelete = -1;
-		for (unsigned int i = 0; i < m_koopas.size(); i++)
-		{
-			//check if the enemy is on the bottom row of the tile
-			if (m_koopas.at(i)->GetPosition().y > 300.0f)
-			{
-				//is the enemy off screen to the left/ right?
-				if (m_koopas.at(i)->GetPosition().x < (float)(m_koopas.at(i)->GetCollisionBox().width * 0.5f) ||
-					m_koopas.at(i)->GetPosition().x > SCREEN_WIDTH - (float)(m_koopas[i]->GetCollisionBox().width * 0.55f))
-				{
-					//if both the conditions meet then set the koopas to false
-					m_koopas.at(i)->SetAlive(false);
-					m_koopas.at(i)->Jump();
-				}
-			}
-			//Update the koopa position
-			m_koopas.at(i)->Update(deltaTime, e);
 
-			//check if the enemy collides with the player
-			if ((m_koopas.at(i)->GetPosition().y > 300.0f || m_koopas.at(i)->GetPosition().y <= 64.0f) &&
-				(m_koopas.at(i)->GetPosition().x<64.0f || m_koopas.at(i)->GetPosition().x>SCREEN_WIDTH - 96.0f))
-			{
-				//ignore the collisions with the player if behind the pipe
-
-				if (Collision::Instance()->Circle(m_koopas[i], _mario))
-				{
-					m_koopas.at(i)->SetAlive(true);
-					_mario->SetAlive(true);
-				}
-			}
-			else //if not beyond the bounds then set the collisions to true
-			{
-				if (Collision::Instance()->Circle(m_koopas[i], _mario))
-				{
-					cout << "Collided" << endl;
-
-					if (m_koopas.at(i)->GetInjured())
-					{
-						m_koopas.at(i)->SetAlive(false);
-					}
-					else
-					{
-						//kill mario
-						_mario->SetAlive(false);
-					}
-				}
-			}
-			//if the enemy is no longer alive then schedule it for deletion
-			if (!m_koopas[i]->GetAlive())
-			{
-				enemyToDelete = i;
-			}
-			if (enemyToDelete != -1)
-			{
-				m_koopas.erase(m_koopas.begin() + enemyToDelete);
-
-			}
-
-			for (unsigned int i = 0; i < m_koopas.size(); i++)
-			{
-				/*Update(deltaTime, e);*/
-				for (unsigned int i = 0; i < m_koopas.size(); i++)
-				{
-					/*Update(deltaTime, e);*/
-					m_koopas.at(i)->KoopaMovements(deltaTime);
-				}
-
-			}
-		}
-	}
-}
-void GameScreenLevel1::CreateKoopa(Vector2D position, FACING direction, float speed)
-{
-	CharacterKoopa* _koopa;
-	_koopa = new CharacterKoopa(m_renderer, "Images/Koopa.png", position, m_level_map, direction, speed);
-	m_koopas.push_back(_koopa);
 }
 
+
+//Setup
 bool GameScreenLevel1::SetUpLevel()
 {
-	_mario = new MarioCharacter(m_renderer, "Images/Mario.png", Vector2D(64, 240), m_level_map);
-	_luigi = new LuigiCharacter(m_renderer, "Images/Luigi.png", Vector2D(64, 240), m_level_map);
+	_text = new Text(m_renderer, "Fonts/BASTION_.TTF", "Level 1", MEDIUMTEXTSIZE, { 225,225,225,225 });
+	LoadScores();
+
+
+	_mario_healthText = new Text(m_renderer, "Fonts/BASTION_.TTF", to_string(mario_health), SMALLTEXTSIZE);
+
+	_luigi_healthText = new Text(m_renderer, "Fonts/BASTION_.TTF", to_string(luigi_health), SMALLTEXTSIZE);
+
+	_mario = new MarioCharacter(m_renderer, "Images/Sprite/Mario.png", Vector2D(64, 353), m_level_map);
+	_luigi = new LuigiCharacter(m_renderer, "Images/Sprite/Luigi.png", Vector2D(64, 240), m_level_map);
 	
-	
-	CreateKoopa(Vector2D(300, 325), FACING_RIGHT, KOOPA_SPEED);
-	CreateKoopa(Vector2D(350, 353), FACING_LEFT, KOOPA_SPEED);
+	CreateKoopa(Vector2D(256, 360), FACING_RIGHT, KOOPA_SPEED);
+	CreateKoopa(Vector2D(255, 128), FACING_LEFT, KOOPA_SPEED);
 
 	m_pow_block = new PowBlock(m_renderer, m_level_map);
-	m_coins = new Coins(m_renderer, m_level_map);
+
+	CoinCreator(Vector2D(380, 350));
+	CoinCreator(Vector2D(100, 240));
+
 	m_screenshake = false;
 	m_background_yPos = 0.0f;
 
@@ -174,28 +154,31 @@ bool GameScreenLevel1::SetUpLevel()
 		cout << "Failed to load background texture!" << endl;
 		return false;
 	}
-}
-void GameScreenLevel1::KoopaCreator()
-{
-	CreateKoopa(Vector2D(150, 353), FACING_RIGHT, KOOPA_SPEED);
-	CreateKoopa(Vector2D(325, 353), FACING_LEFT, KOOPA_SPEED);
-}
 
+
+
+}
 void GameScreenLevel1::SetLevelMap()
 {
-	int map[MAP_HEIGHT][MAP_WIDTH] = { { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-												  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-												  { 1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,1 },
-												  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-												  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-												  { 0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0 },
-												  { 1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1 },
-												  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-												  { 0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0 },
-												  { 1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,1 },
-												  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-												  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-												  { 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 } };
+	ifstream infile;
+	infile.open("Levels/Level1.txt", ios::in);
+	int map[MAP_HEIGHT][MAP_WIDTH];
+	int tempNum;
+	if (!infile.is_open())
+	{
+		cout << "file could not open" << endl;
+	}
+
+	for (int i = 0; i < 13; i++)
+	{
+		for (int j = 0; j < 16; j++)
+		{
+			infile >> tempNum;
+			map[i][j] = tempNum;
+		}
+		cout << endl;
+	}
+	infile.close();
 
 	if (m_level_map != nullptr)
 	{
@@ -203,6 +186,142 @@ void GameScreenLevel1::SetLevelMap()
 	}
 	m_level_map = new LevelMaps(map);
 }
+
+//Updates
+void GameScreenLevel1::UpdateEnemies(float deltaTime, SDL_Event e)
+{
+	if (!m_koopas.empty())
+	{
+		for (int i = 0; i < m_koopas.size(); i++)
+		{
+			m_koopas.at(i)->Update(deltaTime, e);
+			if (m_koopas.at(i)->GetPosition().x + m_koopas[i]->GetCollisionBox().width >= 500.0f || m_koopas.at(i)->GetPosition().x <= 80.0f &&
+				m_koopas.at(i)->GetPosition().y + m_koopas[i]->GetCollisionBox().height >= 400.0f || m_koopas.at(i)->GetPosition().y <= 0.0f)
+			{
+				//cout << "Ignore Collisions" << endl;
+			}
+			else if (_mario->GetCollisionBox().x + _mario->GetCollisionBox().width >= m_koopas.at(i)->GetCollisionBox().x && _mario->GetCollisionBox().x <= m_koopas.at(i)->GetCollisionBox().x && _mario->GetCollisionBox().y + _mario->GetCollisionBox().height >= m_koopas.at(i)->GetCollisionBox().y && _mario->GetCollisionBox().y <= m_koopas.at(i)->GetCollisionBox().y)
+			{
+
+				if (_mario->Isjumping())
+				{
+					m_koopas.at(i)->TakeDamage();
+				}
+				else
+				{
+					MarioHealth();
+				}
+			}
+
+			//luigi
+			else if (_luigi->GetCollisionBox().x + _luigi->GetCollisionBox().width >= m_koopas.at(i)->GetCollisionBox().x && _luigi->GetCollisionBox().x <= m_koopas.at(i)->GetCollisionBox().x && _luigi->GetCollisionBox().y + _luigi->GetCollisionBox().height >= m_koopas.at(i)->GetCollisionBox().y && _luigi->GetCollisionBox().y <= m_koopas.at(i)->GetCollisionBox().y)
+			{
+				if (_luigi->Isjumping())
+				{
+					m_koopas.at(i)->TakeDamage();
+				}
+				else
+				{
+					LuigiHealth();
+				}
+			}
+
+
+
+			//	Moving Koopas
+			if (i == 1)
+			{
+				if (m_koopas.at(i)->GetPosition().x <= 128)
+				{
+					m_koopas.at(i)->Update(deltaTime, e);
+					m_koopas.at(i)->MoveRight(deltaTime);
+				}
+				if (m_koopas.at(i)->GetPosition().x + m_koopas.at(i)->GetCollisionBox().width >= 380)
+				{
+					m_koopas.at(i)->Update(deltaTime, e);
+					m_koopas.at(i)->MoveLeft(deltaTime);
+				}
+			}
+			else
+			{
+				if (m_koopas.at(i)->GetPosition().x <= 80)
+				{
+					//cout << "Koopas out of frame" << endl;
+					m_koopas.at(i)->Update(deltaTime, e);
+					m_koopas.at(i)->MoveRight(deltaTime);
+				}
+				if (m_koopas.at(i)->GetPosition().x + m_koopas.at(i)->GetCollisionBox().width >= 500)
+				{
+					m_koopas.at(i)->Update(deltaTime, e);
+					m_koopas.at(i)->MoveLeft(deltaTime);
+				}
+			}
+		}
+	}
+
+}
+void GameScreenLevel1::UpdatePOWBlock()
+{
+	if (Collision::Instance()->Box(_mario->GetCollisionBox(), m_pow_block->GetCollisionBox()))
+	{
+		if (m_pow_block->IsAvailable())
+		{
+			if (_mario->Isjumping())
+			{
+				DoScreenShake();
+
+				m_pow_block->TakeHit();
+				_mario->CancelJump();
+			}
+		}
+	}
+}
+void GameScreenLevel1::UpdateCoins(float deltaTime, SDL_Event e)
+{
+	if (!_coins.empty())
+	{
+		for (int i = 0; i < _coins.size(); i++)
+		{
+			_coins.at(i)->Update(deltaTime, e);
+
+			if (Collision::Instance()->Circle(_mario, _coins.at(i)))
+			{
+				ScoreRecord(10);
+				_coins.at(i)->CoinSound(true);
+				cout << "Coint at " << i << " collided" << endl;
+				_coins.erase(_coins.begin() + i);
+			}
+			else if (Collision::Instance()->Circle(_luigi, _coins.at(i)))
+			{
+				ScoreRecord(10);
+				_coins.at(i)->CoinSound(true);
+				cout << "Coint at " << i << " collided" << endl;
+				_coins.erase(_coins.begin() + i);
+			}
+
+		}
+	}
+}
+
+void GameScreenLevel1::MarioDead()
+{
+
+}
+//Create
+void GameScreenLevel1::CreateKoopa(Vector2D position, FACING direction, float speed)
+{
+	CharacterKoopa* _koopa;
+	_koopa = new CharacterKoopa(m_renderer, "Images/Koopa.png", position, m_level_map, direction, speed);
+	m_koopas.push_back(_koopa);
+}
+void GameScreenLevel1::CoinCreator(Vector2D position)
+{
+	Coins* coins;
+	coins = new Coins(m_renderer, "Images/Coin.png", position, m_level_map);
+	_coins.push_back(coins);
+}
+
+//Extras
 
 void GameScreenLevel1::DoScreenShake()
 {
@@ -215,65 +334,3 @@ void GameScreenLevel1::DoScreenShake()
 		m_koopas.at(i)->TakeDamage();
 	}
 }
-void GameScreenLevel1::UpdatePOWBlock()
-{
-	if (Collision::Instance()->Box(_mario->GetCollisionBox(), m_pow_block->GetCollisionBox()))
-	{
-		if (m_pow_block->IsAvailable())
-		{
-			if (_mario->Isjumping())
-			{
-				DoScreenShake();
-				m_pow_block->TakeHit();
-				_mario->CancelJump();
-			}
-		}
-	}
-}
-
-//if (!m_koopas.empty())
-//{
-//	int enemyToDelete = -1;
-//	for (unsigned int i = 0; i < m_koopas.size(); i++)
-//	{
-//		//check if the enemy is on the bottom row of tiles
-//		if (m_koopas.at(i)->GetPosition().y > 300.0f)
-//		{
-//			if (m_koopas.at(i)->GetPosition().x < (float)(m_koopas.at(i)->GetCollisionBox().width * 0.5f) ||
-//				m_koopas.at(i)->GetPosition().x > SCREEN_WIDTH - (float)(m_koopas[i]->GetCollisionBox().width * 0.55f))
-//			{
-//				m_koopas.at(i)->SetAlive(false);
-//			}
-//		}
-//		m_koopas.at(i)->Update(deltaTime, e);
-//
-//		//check to see if enemy collides with player
-//		if ((m_koopas.at(i)->GetPosition().y > 300.0f || m_koopas.at(i)->GetPosition().y <= 64.0f) &&
-//			(m_koopas.at(i)->GetPosition().x<64.0f || m_koopas.at(i)->GetPosition().x>SCREEN_WIDTH - 96.0f))
-//		{
-//			//ignore the collisions
-//		}
-//		else
-//		{
-//			if (Collision::Instance()->Circle(m_koopas[i], _mario))
-//			{
-//				cout << "Collided" << endl;
-//				if (m_koopas.at(i)->GetInjured())
-//				{
-//					m_koopas.at(i)->SetAlive(false);
-//				}
-//				else
-//				{
-//					//kill mario
-//					_mario->SetAlive(false);
-//					_mario = nullptr;
-//					delete[] _mario;
-//				}
-//			}
-//		}
-//		//if the enemy is no longer alive then schedule it for deletion
-//		if (!m_koopas[i]->GetAlive())
-//		{
-//			enemyToDelete = i;
-//		}
-//	}

@@ -22,7 +22,7 @@ void TitleScreen::Update(float deltaTime, SDL_Event e)
 bool TitleScreen::EnableTitleScreen()
 {
 	title_screen = new Texture2D(m_renderer);
-	if (!title_screen->LoadFromFile("Images/Level1.png"))
+	if (!title_screen->LoadFromFile("Images/Test.png"))
 	{
 		cout << "Title Screen failed to load!" << endl;
 		return false;

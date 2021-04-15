@@ -88,12 +88,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>X:\Repos\Mario_Repo\Mario_Repo\Mario\Mario\SDL2\SDL\mixer_include;X:\Repos\Mario_Repo\Mario_Repo\Mario\Mario\SDL2\SDL\include;X:\Repos\Mario_Repo\Mario_Repo\Mario\Mario\SDL2\SDL\image_include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\SDL2\SDL\include;X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\SDL2\SDL\image_include;X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\SDL2\SDL\mixer_include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>X:\Repos\Mario_Repo\Mario_Repo\Mario\Mario\SDL2;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\SDL2</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -104,12 +105,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\SDL2\SDL\include;X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\SDL2\SDL\image_include;X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\SDL2\SDL\mixer_include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\SDL2</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -118,10 +122,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(PROJECTDIR)\SDL2\SDL\include;$(PROJECTDIR)\SDL2\SDL\image_include;$(PROJECTDIR)\SDL2\SDL\mixer_include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(PROJECTDIR)\SDL2\SDL</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -132,30 +138,38 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(PROJECTDIR)\SDL2\SDL\include;$(PROJECTDIR)\SDL2\SDL\image_include;$(PROJECTDIR)\SDL2\SDL\mixer_include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(PROJECTDIR)\SDL2\SDL</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Character.cpp" />
+    <ClCompile Include="CharacterGoomba.cpp" />
     <ClCompile Include="CharacterKoopa.cpp" />
     <ClCompile Include="Coins.cpp" />
     <ClCompile Include="Collision.cpp" />
+    <ClCompile Include="GameOver.cpp" />
     <ClCompile Include="GameScreen.cpp" />
     <ClCompile Include="GameScreenLevel1.cpp" />
+    <ClCompile Include="GameScreenLevel2.cpp" />
     <ClCompile Include="GameScreenManager.cpp" />
+    <ClCompile Include="HighScore.cpp" />
     <ClCompile Include="LevelMaps.cpp" />
     <ClCompile Include="LuigiCharacter.cpp" />
-    <ClCompile Include="Mario.cpp" />
+    <ClCompile Include="MainGame.cpp" />
+    <ClCompile Include="MainMenu.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="MarioCharacter.cpp" />
     <ClCompile Include="PowBlock.cpp" />
     <ClCompile Include="Sounds.cpp" />
+    <ClCompile Include="Text.cpp" />
     <ClCompile Include="Texture2D.cpp" />
-    <ClCompile Include="TitleScreen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="SDL2\SDL\SDL2.lib" />
@@ -163,24 +177,32 @@
     <Library Include="SDL2\SDL\SDL2test.lib" />
     <Library Include="SDL2\SDL\SDL2_image.lib" />
     <Library Include="SDL2\SDL\SDL2_mixer.lib" />
+    <Library Include="SDL2_ttf.lib" />
+    <Library Include="SDL_ttf.lib" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Character.h" />
+    <ClInclude Include="CharacterGoomba.h" />
     <ClInclude Include="CharacterKoopa.h" />
     <ClInclude Include="Coins.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Commons.h" />
     <ClInclude Include="constants.h" />
+    <ClInclude Include="GameOver.h" />
     <ClInclude Include="GameScreen.h" />
     <ClInclude Include="GameScreenLevel1.h" />
+    <ClInclude Include="GameScreenLevel2.h" />
     <ClInclude Include="GameScreenManager.h" />
+    <ClInclude Include="HighScore.h" />
     <ClInclude Include="LevelMaps.h" />
     <ClInclude Include="LuigiCharacter.h" />
+    <ClInclude Include="MainGame.h" />
+    <ClInclude Include="MainMenu.h" />
     <ClInclude Include="MarioCharacter.h" />
     <ClInclude Include="PowBlock.h" />
     <ClInclude Include="Sounds.h" />
+    <ClInclude Include="Text.h" />
     <ClInclude Include="Texture2D.h" />
-    <ClInclude Include="TitleScreen.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,0 +1,5 @@
+Score is: 20
+Score is: 30
+Score is: 50
+Score is: 20
+Score is: 20
