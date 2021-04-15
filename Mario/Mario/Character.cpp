@@ -5,12 +5,15 @@ using namespace std;
 
 Character::Character(SDL_Renderer* renderer, string imagepath, Vector2D start_position, LevelMaps* maps)
 {
+
 	m_renderer = renderer;
 	m_texture = new Texture2D(renderer);
 	m_texture->LoadFromFile(imagepath);
 	m_current_level_map = maps;
 	m_position = start_position;
 	m_alive = true;
+	m_collision_radius = 15.0f;
+
 }
 
 Character::~Character()
@@ -32,6 +35,7 @@ void Character::Update(float deltaTime, SDL_Event e)
 {
 	int foot_position;
 	int centralX_position;
+
 	if (m_jumping)
 	{
 		//adjust position
@@ -56,7 +60,7 @@ void Character::Update(float deltaTime, SDL_Event e)
 	{
 		MoveRight(deltaTime);
 	}
-	centralX_position = (int)(m_position.x + (m_texture->GetWidth())*0.5) / TILE_WIDTH;
+	centralX_position = (int)(m_position.x + (m_texture->GetWidth()/ m_single_sprite_w)*0.5) / TILE_WIDTH;
 	foot_position = (int)(m_position.y + m_texture->GetHeight()) / TILE_HEIGHT;
 
 	if (m_current_level_map->GetTileAt(foot_position, centralX_position) == 0)
@@ -67,15 +71,17 @@ void Character::Update(float deltaTime, SDL_Event e)
 	{
 		m_can_jump=true;
 	}
-
 }
+
 float Character::GetCollisionRadius()
 {
 	return m_collision_radius;
 }
-Rect2D Character::GetCollisionBox() {
-	return Rect2D(m_position.x, m_position.y, m_texture->GetWidth(), m_texture->GetHeight());
+Rect2D Character::GetCollisionBox()
+{
+	return Rect2D(m_position.x, m_position.y, m_single_sprite_w, m_single_sprite_h);
 }
+
 void Character::SetPosition(Vector2D new_position)
 {
 	m_position = new_position;
@@ -84,6 +90,7 @@ Vector2D Character::GetPosition()
 {
 	return m_position;
 }
+
 
 void Character::MoveLeft(float deltaTime)
 {

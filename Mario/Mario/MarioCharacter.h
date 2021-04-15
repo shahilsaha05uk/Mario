@@ -3,12 +3,12 @@
 #pragma once
 
 #include "Character.h"
+#include "Sounds.h"
 
 class MarioCharacter : public Character
 {
 private:
-	Sounds* _jumpSound;
-
+	bool dead_mario;
 
 public:
 	MarioCharacter(SDL_Renderer* renderer, string imagePath, Vector2D start_position, LevelMaps* maps);
@@ -17,9 +17,10 @@ public:
 	virtual void Render();
 	virtual void Update(float deltaTime, SDL_Event e);
 
-	void SetPosition(Vector2D new_position);
-	Vector2D GetPosition();
-
+	void MarioKeyboard(float deltatime, SDL_Event e);
+	//void MarioAnimation(float deltaTime, SDL_Event e, bool jump);
+	void MarioAnimation(float deltaTime, SDL_Event e);
+	bool deadMario(bool b =false);
 	void JumpSound(bool play);
 };
 

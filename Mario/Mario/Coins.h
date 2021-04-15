@@ -1,30 +1,33 @@
+#ifndef _COINS_H_
+#define _COINS_H_
+
+
 #pragma once
 
-#include "Texture2D.h"
 #include "constants.h"
 #include <string>
 #include <iostream>
-#include "LevelMaps.h"
+#include "Character.h"
 using namespace std;
-class Coins
+class Coins : public Character
 {
 private:
-	Texture2D* _texture;
-	LevelMaps* m_level_maps;
-	SDL_Renderer* m_renderer;
-	Vector2D m_position;
-
+	float m_single_sprite_w;
+	float m_single_sprite_h;
 	int m_total_coin_frames;
-	float m_single_sprite_width; 
-	float  m_single_sprite_height;
+
+	float frame_delay;
+	int currentFrame;
+
+	Sounds* _coinSound;
 public:
-	Coins(SDL_Renderer* renderer, LevelMaps* maps);
+	Coins(SDL_Renderer* renderer, string imagePath, Vector2D start_position, LevelMaps* maps);
 	~Coins();
 
 	virtual void Render();
 	virtual void Update(float deltaTime, SDL_Event e);
 
-	string LoadFile();
-
+	void CoinSound(bool play);
 };
 
+#endif // !_COINS_H_

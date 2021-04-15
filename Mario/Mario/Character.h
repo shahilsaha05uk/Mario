@@ -5,15 +5,24 @@
 
 using namespace std;
 
+//#include "SDL.h"
+//#include <iostream>
+//#include "Commons.h"
+//#include "constants.h"
+//#include "Texture2D.h"
+//#include <string>
+//#include "LevelMaps.h"
+//#include "Sounds.h"
+
 #include "SDL.h"
 #include <iostream>
+#include <SDL_mixer.h>
 #include "Commons.h"
-#include "constants.h"
-#include "Texture2D.h"
-#include <string>
 #include "LevelMaps.h"
+#include "Texture2D.h"
+#include "Constants.h"
 #include "Sounds.h"
-
+#include "Text.h"
 class Texture2D;
 class CharacterKoopa;
 class Character
@@ -39,10 +48,25 @@ protected:
 
 	bool m_alive;
 
-	virtual void MoveLeft(float deltaTime);
-	virtual void MoveRight(float deltaTime);
+	//virtual void MoveLeft(float deltaTime);
+	//virtual void MoveRight(float deltaTime);
 	virtual void AddGravity(float deltaTime);
 	virtual void Jump();
+
+	//sprite members
+	float m_single_sprite_w;
+	float m_single_sprite_h;
+
+	//animation members
+	int TotalframesCount;
+	int currentFrameCount;
+	float mtimer;
+	const float fixedtimer = 10.0f;
+
+	//Sounds members
+	Sounds* _jumpSound;
+
+
 public:
 	Character(SDL_Renderer* renderer, string imagepath, Vector2D start_position, LevelMaps* maps);
 	~Character();
@@ -61,6 +85,13 @@ public:
 	void SetAlive(bool isAlive) { m_alive = isAlive; }
 	bool GetAlive() { return m_alive; }
 
+	virtual void MoveLeft(float deltaTime);
+	virtual void MoveRight(float deltaTime);
+
+
+
+	//virtual void AddGravity(float deltaTime);
+	//virtual void Jump();
 };
 
 #endif // !_CHARACTER

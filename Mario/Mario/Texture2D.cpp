@@ -22,7 +22,7 @@ bool Texture2D::LoadFromFile(std::string path)
 	Free();
 	SDL_Surface* p_surface = nullptr;
 	m_texture = nullptr;
-	//Load the image
+
 	p_surface = IMG_Load(path.c_str());
 	if (p_surface != nullptr)
 	{
@@ -34,8 +34,6 @@ bool Texture2D::LoadFromFile(std::string path)
 		cout << "Unable to create texture from surface. Error: " << SDL_GetError();
 	}
 
-
-	//remove the loaded surface coz we already have the texture now
 	SDL_FreeSurface(p_surface);
 
 	if (m_texture != nullptr)
@@ -50,32 +48,18 @@ bool Texture2D::LoadFromFile(std::string path)
 }
 void Texture2D::Render(Vector2D new_position, SDL_RendererFlip flip, double angle)
 {
-
 	if (angle > 360)
 	{
 		angle = 0;
 	}
-	//Clear the screen
 
-	//set where to render the texture
 	SDL_Rect renderLocation = { new_position.x,new_position.y, m_width, m_height };
 
-	//Render to screen
 	SDL_RenderCopyEx(m_renderer, m_texture, NULL, &renderLocation, angle, NULL, flip);
-
-	/*Parameters:
-	1. The renderer
-	2. The texture
-	3. The source of the rectangle
-	4. The destination rectangle
-	5. an angle
-	6. a SDL_Point of center of the texture
-	7. Flipping- Hori, Verti*/
 }
 void Texture2D::Render(SDL_Rect src_rect, SDL_Rect src_dest, SDL_RendererFlip flip, double angle)
 {
 	SDL_RenderCopyEx(m_renderer, m_texture, &src_rect, &src_dest, angle, NULL, flip);
-
 }
 
 void Texture2D::Free()
