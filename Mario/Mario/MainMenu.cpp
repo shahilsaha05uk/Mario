@@ -5,7 +5,6 @@ MainMenu::MainMenu(SDL_Renderer* renderer) : GameScreen(renderer)
 	Load();
 	quit = false;
 	m_renderer = renderer;
-	//score = new HighScore(renderer, true);
 }
 MainMenu::~MainMenu()
 {
@@ -28,82 +27,30 @@ void MainMenu::Render()
 void MainMenu::Update(float deltaTime, SDL_Event e)
 {
 	MenuTextUpdate(deltaTime, e);
-	//ScreenLoader(e, deltaTime);
 }
-//void MainMenu::ScreenLoader(SDL_Event e, float deltatime)
-//{
-//	int x = 0;
-//	int y = 0;
-//
-//	switch (e.type)
-//	{
-//	case SDL_KEYDOWN:
-//		switch (e.key.keysym.sym)
-//		{
-//		case SDLK_ESCAPE:
-//			//score = new HighScore(g_renderer,true);
-//			score->StoreScore(false);
-//			//SDL_EventState(SDL_MOUSEBUTTONDOWN, SDL_ENABLE);
-//
-//			//SDL_EventState(SDL_MOUSEBUTTONDOWN, SDL_IGNORE);
-//
-//			break;
-//		}
-//	case SDL_KEYUP:
-//		switch (e.key.keysym.sym)
-//		{
-//		case SDLK_ESCAPE:
-//			score->StoreScore(true);
-//			break;
-//		}
-//
-//	case SDL_MOUSEBUTTONDOWN:
-//		x = e.button.x;
-//		y = e.button.y;
-//
-//		switch (e.button.button)
-//		{
-//			for (int i = 0; i < 4; i++)
-//			{
-//				switch (i)
-//				{
-//				case 0:
-//					if ((x > MainMenuRect[i]->x) && (x < MainMenuRect[i]->x + MainMenuRect[i]->w) && (y > MainMenuRect[i]->y) && (y < MainMenuRect[i]->y + MainMenuRect[i]->h))
-//					{
-//						cout << "Level 1 load" << endl;
-//						game_manger->ChangeScreen(SCREEN_LEVEL1);
-//
-//						quit = false;
-//						while (!quit)
-//						{
-//							Render();
-//							SDL_EventState(SDL_MOUSEBUTTONDOWN, SDL_IGNORE);
-//						}
-//					}
-//				}
-//			}
-//		}
-//	}
-//}
+
+
+
 void MainMenu::MenuTextLoad()
 {
+	game_manager = new GameScreenManager(m_renderer);
 	for (int i = 0; i < 4; i++)
 	{
 		if (i == 0)
 		{
-			_menuText[i] = new Text(m_renderer, "Fonts/BASTION_.TTF",  "Level 1", MEDIUMTEXTSIZE, { 255,255,255,255 });
+			_menuText[i] = new Text(m_renderer, game_manager->fontLoad[1],  "Level 1", { 255,255,255,255 });
 		}
 		if (i == 1)
 		{
-			_menuText[i] = new Text(m_renderer, "Fonts/BASTION_.TTF",  "Level 2", MEDIUMTEXTSIZE, { 255,255,255,255 });
+			_menuText[i] = new Text(m_renderer, game_manager->fontLoad[1],  "Level 2", { 255,255,255,255 });
 		}
 		if (i == 2)
 		{
-			_menuText[i] = new Text(m_renderer, "Fonts/BASTION_.TTF",  "High Score", MEDIUMTEXTSIZE, { 255,255,255,255 });
+			_menuText[i] = new Text(m_renderer, game_manager->fontLoad[1],  "High Score", { 255,255,255,255 });
 		}
 		if (i == 3)
 		{
-			_menuText[i] = new Text(m_renderer, "Fonts/BASTION_.TTF", "Quit",  MEDIUMTEXTSIZE, { 255,255,255,255 });
+			_menuText[i] = new Text(m_renderer, game_manager->fontLoad[1], "Quit",  { 255,255,255,255 });
 		}
 	}
 }
@@ -163,11 +110,11 @@ void MainMenu::MenuTextUpdate(float deltaTime, SDL_Event e)
 			{
 				if ((x > MainMenuRect[i]->x) && (x < MainMenuRect[i]->x + MainMenuRect[i]->w) && (y > MainMenuRect[i]->y) && (y < MainMenuRect[i]->y + MainMenuRect[i]->h))
 				{
-					_menuText[i]->Load(m_renderer, "Fonts/BASTION_.ttf", "Level 1", color, MEDIUMTEXTSIZE);
+					_menuText[i]->Load(m_renderer, game_manager->fontLoad[1], "Level 1", color);
 				}
 				else
 				{
-					_menuText[i]->Load(m_renderer, "Fonts/BASTION_.ttf", "Level 1", _menuText[i]->default_color, MEDIUMTEXTSIZE);
+					_menuText[i]->Load(m_renderer, game_manager->fontLoad[1], "Level 1", _menuText[i]->default_color);
 				}
 			}
 			//new Game
@@ -175,24 +122,23 @@ void MainMenu::MenuTextUpdate(float deltaTime, SDL_Event e)
 			{
 				if ((x > MainMenuRect[i]->x) && (x < MainMenuRect[i]->x + MainMenuRect[i]->w) && (y > MainMenuRect[i]->y) && (y < MainMenuRect[i]->y + MainMenuRect[i]->h))
 				{
-					_menuText[i]->Load(m_renderer, "Fonts/BASTION_.ttf", "Level 2", color, MEDIUMTEXTSIZE);
+					_menuText[i]->Load(m_renderer, game_manager->fontLoad[1], "Level 2", color);
 				}
 				else
 				{
-					_menuText[i]->Load(m_renderer, "Fonts/BASTION_.ttf", "Level 2", _menuText[i]->default_color, MEDIUMTEXTSIZE);
+					_menuText[i]->Load(m_renderer, game_manager->fontLoad[1], "Level 2", _menuText[i]->default_color);
 				}
 			}
-
 			//highScore
 			if (i == 2)
 			{
 				if ((x > MainMenuRect[i]->x) && (x < MainMenuRect[i]->x + MainMenuRect[i]->w) && (y > MainMenuRect[i]->y) && (y < MainMenuRect[i]->y + MainMenuRect[i]->h))
 				{
-					_menuText[i]->Load(m_renderer, "Fonts/BASTION_.ttf", "High Score", color, MEDIUMTEXTSIZE);
+					_menuText[i]->Load(m_renderer, game_manager->fontLoad[1], "High Score", color);
 				}
 				else
 				{
-					_menuText[i]->Load(m_renderer, "Fonts/BASTION_.ttf", "High Score", _menuText[i]->default_color, MEDIUMTEXTSIZE);
+					_menuText[i]->Load(m_renderer, game_manager->fontLoad[1], "High Score", _menuText[i]->default_color);
 				}
 
 			}
@@ -201,11 +147,11 @@ void MainMenu::MenuTextUpdate(float deltaTime, SDL_Event e)
 			{
 				if ((x > MainMenuRect[i]->x) && (x < MainMenuRect[i]->x + MainMenuRect[i]->w) && (y > MainMenuRect[i]->y) && (y < MainMenuRect[i]->y + MainMenuRect[i]->h))
 				{
-					_menuText[i]->Load(m_renderer, "Fonts/BASTION_.ttf", "Quit", color, MEDIUMTEXTSIZE);
+					_menuText[i]->Load(m_renderer, game_manager->fontLoad[1], "Quit", color);
 				}
 				else
 				{
-					_menuText[i]->Load(m_renderer, "Fonts/BASTION_.ttf", "Quit", _menuText[i]->default_color, MEDIUMTEXTSIZE);
+					_menuText[i]->Load(m_renderer, game_manager->fontLoad[1], "Quit", _menuText[i]->default_color);
 				}
 
 			}

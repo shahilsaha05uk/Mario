@@ -6,6 +6,8 @@ LuigiCharacter::LuigiCharacter(SDL_Renderer* renderer, string imagePath, Vector2
 	m_single_sprite_h = m_texture->GetHeight();
 	m_single_sprite_w = m_texture->GetWidth() / 6;
 	TotalframesCount = 6;
+	_jumpSound = new Sounds();
+	_jumpSound->LoadMusic("Sounds/LuigiJump.wav");
 }
 LuigiCharacter::~LuigiCharacter()
 {
@@ -60,8 +62,12 @@ void LuigiCharacter::LuigiKeyboard(float deltatime, SDL_Event e)
 		case SDLK_w:
 			if (m_can_jump)
 			{
-				cout << "Down" << endl;
 				Jump();
+				JumpSound(true);
+			}
+			else
+			{
+				JumpSound(false);
 			}
 		}
 		break;
@@ -75,7 +81,14 @@ void LuigiCharacter::LuigiKeyboard(float deltatime, SDL_Event e)
 			m_moving_right = false;
 			break;
 		case SDLK_w:
-			cout << "JumpUp" << endl;
+			if (!m_can_jump)
+			{
+				JumpSound(false);
+			}
+			else
+			{
+				JumpSound(false);
+			}
 
 		default:
 			break;
@@ -85,7 +98,16 @@ void LuigiCharacter::LuigiKeyboard(float deltatime, SDL_Event e)
 	}
 
 }
-
+void LuigiCharacter::JumpSound(bool play)
+{
+	if (play == true)
+	{
+		if (SDL_GetAudioStatus() == SDL_AUDIO_STOPPED)
+		{
+			_jumpSound->Play(0);
+		}
+	}
+}
 void LuigiCharacter::LuigiAnimation(float deltaTime, SDL_Event e)
 {
 	mtimer += deltaTime;

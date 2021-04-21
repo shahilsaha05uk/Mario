@@ -12,14 +12,11 @@ using namespace std;
 class Coins : public Character
 {
 private:
-	float m_single_sprite_w;
-	float m_single_sprite_h;
 	int m_total_coin_frames;
-
 	float frame_delay;
 	int currentFrame;
-
 	Sounds* _coinSound;
+
 public:
 	Coins(SDL_Renderer* renderer, string imagePath, Vector2D start_position, LevelMaps* maps);
 	~Coins();

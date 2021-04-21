@@ -17,7 +17,6 @@ struct Vector2D
 		y = initial_y;
 	}
 
-
 };
 
 enum SCREENS
@@ -46,6 +45,5 @@ struct Rect2D
 		y = y_pos;
 		this->width = width;
 		this->height = height;
-		//"this pointer" to refer to the variables outside the constructor
 	}
 };

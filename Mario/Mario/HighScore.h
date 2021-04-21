@@ -3,20 +3,17 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include "GameScreenManager.h"
 
-class MainGame;
 
 class HighScore : public GameScreen
 {
 private:
-	//MainGame* game;
-	vector<Text*> _scoretext;
+	vector < Text*> _scoretext;
 	vector<string> tempStore;
 
 	int FileSize;
 	int score;
-
-
 
 	ifstream Score_infile;
 	ofstream Score_outfile;
@@ -29,9 +26,9 @@ public:
 	void Update(SDL_Event e, float deltatime);
 	void Render();
 
+	void UpdateFile();
 	void ReadInFile();
-	void WriteInFile();
-	//void StoreScore(bool b=false);
+	void RenderScores();
 
 };
 

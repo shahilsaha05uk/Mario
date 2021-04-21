@@ -1,18 +1,17 @@
 #include "Text.h"
-Text::Text(SDL_Renderer* renderer, string path, string text, int fontsize, SDL_Color color)
+Text::Text(SDL_Renderer* renderer, TTF_Font* font, string text, SDL_Color color)
 {
 	_renderer = renderer;;
-	_path = path;
-	_fontsize = fontsize;
 	_color = color;
 
-
-	text_texture = Load(renderer, path, text, color, fontsize);
+	_fonts = font;
+	text_texture = Load(renderer, _fonts, text, color);
 	SDL_QueryTexture(text_texture, NULL, NULL, &text_rect.w, &text_rect.h);
 }
 Text::~Text()
 {
-
+	text_texture = nullptr;
+	delete[] text_texture;
 }
 
 void Text::Render(SDL_Rect rect, SDL_Renderer* renderer)
@@ -22,25 +21,28 @@ void Text::Render(SDL_Rect rect, SDL_Renderer* renderer)
 
 	SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
 }
-
-SDL_Texture* Text::Load(SDL_Renderer* renderer, string path, string text, SDL_Color color, int fontsize)
+SDL_Texture* Text::Load(SDL_Renderer* renderer, TTF_Font* font, string text, SDL_Color color)
 {
-	TTF_Font* font = TTF_OpenFont(path.c_str(), fontsize);
+	if (font == nullptr)
+	{
+		return nullptr;
+	}
+
 	SDL_Surface* text_surface = TTF_RenderText_Solid(font, text.c_str(), color);
-	text_texture = SDL_CreateTextureFromSurface(renderer,text_surface);
+	text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
 
 	SDL_FreeSurface(text_surface);
 	return text_texture;
 
 }
+
 void Text::Update(string updated_text)
 {
-	text_texture = Load(_renderer, _path, updated_text, _color, _fontsize);
-
+	text_texture = Load(_renderer, _fonts, updated_text, _color);
 }
 void Text::Update(string updated_text, SDL_Color updated_color)
 {
-	text_texture = Load(_renderer, _path, updated_text, updated_color, _fontsize);
+	text_texture = Load(_renderer, _fonts, updated_text, updated_color);
 
 }
 void Text::Draw()

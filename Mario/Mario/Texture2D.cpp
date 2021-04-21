@@ -38,12 +38,10 @@ bool Texture2D::LoadFromFile(std::string path)
 
 	if (m_texture != nullptr)
 	{
-		//cout << "Texture Error: " << IMG_GetError();
 		m_width = p_surface->w;
 		m_height = p_surface->h;
 	}
 
-	//return the texture
 	return m_texture != nullptr;
 }
 void Texture2D::Render(Vector2D new_position, SDL_RendererFlip flip, double angle)

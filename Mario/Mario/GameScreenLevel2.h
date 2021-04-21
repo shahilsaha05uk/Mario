@@ -1,18 +1,10 @@
 #pragma once
 
-#include "Commons.h"
 #include "GameScreen.h"
-#include "LevelMaps.h"
-
-#include "CharacterKoopa.h"
-#include "Coins.h"
-#include "LuigiCharacter.h"
-#include "MarioCharacter.h"
-#include "PowBlock.h"
-#include "CharacterGoomba.h"
+#include "GameScreenManager.h"
 #include <Windows.h>
 #include <vector>
-#include <fstream>
+#include "HighScore.h"
 
 class Texture2D;
 class Character;
@@ -20,19 +12,9 @@ class PowBlock;
 class GameScreenLevel2 : GameScreen
 {
 private:
-	void SetLevelMap();
 
-	void DoScreenShake();
 	float timer;
-
-	//Enemy variables
-	void UpdateEnemies(float deltaTime, SDL_Event e);
-	void UpdateGoomba(float deltaTime, SDL_Event e);
-	void CreateKoopa(Vector2D position, FACING direction, float speed);
-	void CreateGoomba(Vector2D position, FACING direction, float speed);
-	vector<CharacterKoopa*> m_koopas;
 	vector<CharacterGoomba*> m_goomba;
-
 	vector<Coins*> _coins;
 
 public:
@@ -41,12 +23,23 @@ public:
 
 	void Render() override;
 	void Update(float deltaTime, SDL_Event e) override;
-	void UpdatePOWBlock();
-	void deadMario();
-	void KoopaCreator();
-	bool SetUpLevel();
 
-	void CoinCreator(Vector2D position);
+	bool SetUpLevel();
+	void SetLevelMap();
+
+
+
+	//Update
 	void UpdateCoins(float deltaTime, SDL_Event e);
+	void UpdatePOWBlock();
+	void UpdateGoomba(float deltaTime, SDL_Event e);
+
+	//Create
+	void CoinCreator(Vector2D position);
+	void CreateGoomba(Vector2D position, FACING direction, float speed);
+
+	//Extras
+	void DoScreenShake();
+
 
 };

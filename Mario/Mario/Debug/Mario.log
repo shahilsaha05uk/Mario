@@ -1,8 +1,8 @@
-﻿  GameScreen.cpp
-X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\GameScreen.h(54,33): warning C4244: 'initializing': conversion from 'float' to 'const int', possible loss of data
-X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\GameScreen.cpp(51,42): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
-X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\GameScreen.cpp(88,42): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
-  MainGame.cpp
-X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\GameScreen.h(54,33): warning C4244: 'initializing': conversion from 'float' to 'const int', possible loss of data
-  Generating Code...
+﻿  GameScreenLevel1.cpp
+X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\GameScreenLevel1.cpp(51,20): warning C4018: '<': signed/unsigned mismatch
+X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\GameScreenLevel1.cpp(60,20): warning C4018: '<': signed/unsigned mismatch
+X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\GameScreenLevel1.cpp(165,21): warning C4018: '<': signed/unsigned mismatch
+X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\GameScreenLevel1.cpp(267,21): warning C4018: '<': signed/unsigned mismatch
+X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\GameScreenLevel1.cpp(318,20): warning C4018: '<': signed/unsigned mismatch
+X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\GameScreenLevel1.cpp(131): warning C4715: 'GameScreenLevel1::SetUpLevel': not all control paths return a value
   Mario.vcxproj -> X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Debug\Mario.exe

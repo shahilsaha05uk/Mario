@@ -1,6 +1,10 @@
 #include "Character.h"
 #include "Texture2D.h"
 #include "CharacterKoopa.h"
+#include "GameScreen.h"
+
+
+
 using namespace std;
 
 Character::Character(SDL_Renderer* renderer, string imagepath, Vector2D start_position, LevelMaps* maps)
@@ -16,9 +20,13 @@ Character::Character(SDL_Renderer* renderer, string imagepath, Vector2D start_po
 
 }
 
+
 Character::~Character()
 {
 	m_renderer = nullptr;
+}
+Character::Character()
+{
 }
 void Character::Render()
 {
@@ -38,11 +46,8 @@ void Character::Update(float deltaTime, SDL_Event e)
 
 	if (m_jumping)
 	{
-		//adjust position
 		m_position.y -= m_jump_force * deltaTime;
-		//reduce jump position
 		m_jump_force -= JUMP_FORCE_DECREMENT * deltaTime;
-		//if jump force is 0
 		if (m_jump_force <= 0.0f)
 		{
 			m_jumping = false;
@@ -71,6 +76,7 @@ void Character::Update(float deltaTime, SDL_Event e)
 	{
 		m_can_jump=true;
 	}
+	
 }
 
 float Character::GetCollisionRadius()

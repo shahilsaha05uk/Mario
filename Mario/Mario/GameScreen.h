@@ -3,36 +3,39 @@
 
 #include "SDL.h"
 #include <SDL_image.h>
-#include <SDL_ttf.h>
-
-#include "Commons.h"
-#include "LevelMaps.h"
+#include <vector>
 #include <fstream>
-#include "Texture2D.h"
+
+
 #include "CharacterKoopa.h"
 #include "Coins.h"
 #include "LuigiCharacter.h"
 #include "MarioCharacter.h"
+#include "CharacterGoomba.h"
 #include "PowBlock.h"
 #include "Text.h"
 #include "Sounds.h"
-#pragma once
+#include "HealthBar.h"
 
+#pragma once
 class HighScore;
 class GameScreenManager;
-
 class GameScreen
 {
 protected:
 	SDL_Renderer* m_renderer;
+	SDL_Rect* _temprect;
 
 	GameScreenManager* game_manager;
-
 	Texture2D* m_background_texture;
-	MarioCharacter* _mario;
 	LevelMaps* m_level_map;
+	Text* _text;
+	std::vector<int> ScoresVector;
+	HealthBar* health[2];
+
 	PowBlock* m_pow_block;
-	Coins* m_coins;
+	LuigiCharacter* _luigi;
+	MarioCharacter* _mario;
 
 	bool m_screenshake;
 	float m_shake_time;
@@ -40,23 +43,6 @@ protected:
 	float m_background_yPos;
 	float timer;
 	bool quit;
-	//Text render variables
-	Text* _text;
-	SDL_Rect* _temprect;
-
-	//Text * scoretext;
-	Text* _mario_healthText;
-	Text* _luigi_healthText;
-	int health = 100;
-	//int mario_health = 100;
-	//int luigi_health = 100;
-	int healthtimer;
-	const int fixed_health_timer = 10.0f;
-	SDL_Rect* luigiHealthrect;
-	SDL_Rect* marioHealthrect;
-
-	//Score
-	void LoadScores();
 
 
 public:
@@ -67,14 +53,12 @@ public:
 	virtual void Update(float deltaTime, SDL_Event e);
 
 	int ScoreRecord(int score =0);
-	void MarioHealth();
-	int LuigiHealth();
+	void WriteToScoreFile();
 
-
-	int mario_health = 100;
-	int luigi_health = 100;
-
-	LuigiCharacter* _luigi;
+	int mariohealthValue=100;
+	int luigihealthValue = 100;
+	bool playerPositionStatus;
+	Sounds* _sound;
 
 };
 

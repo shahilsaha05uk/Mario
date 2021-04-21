@@ -15,11 +15,12 @@ public:
 
 	virtual void Render();
 	virtual void Update(float deltaTime, SDL_Event e);
+
 	void LuigiKeyboard(float deltatime, SDL_Event e);
 	void LuigiAnimation(float deltaTime, SDL_Event e);
+	void JumpSound(bool play);
 
-	//void SetPosition(Vector2D new_position);
-	//Vector2D GetPosition();
+
 };
 
 #endif // !_LUIGICHARACTER_H_

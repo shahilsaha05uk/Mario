@@ -14,9 +14,10 @@
 #include "Sounds.h"
 #include "constants.h"
 #include "Texture2D.h"
-//#include "GameScreen.h"
 #include "MainMenu.h"
-#include "HighScore.h"
+#include "GameScreen.h"
+
+
 class MainGame
 {
 private:
@@ -31,12 +32,17 @@ private:
 	bool quit;
 	SDL_Event e;
 
+	GameScreen* _gamescreen;
+
+	bool b;
+	
+	//volume
+	const int maxVolume = 10;
+
 	//File stream
 	ofstream outfile;
-	int health;
-	HighScore* score;
+	int Luigihealth;
 protected:
-	//GameScreen* _score;
 	int _scores;
 public:
 	MainGame();
@@ -46,15 +52,11 @@ public:
 	void Render();
 	bool Update();
 
-	void trial(SDL_Event e);
+	void GameControl(SDL_Event e);
+
 
 	void CloseSDL();
 	void PlayBackgroundMusic();
-
-	bool DefaultScreen();
-	void UpdateScoreFile(bool b=false);
-
-
 
 };
 

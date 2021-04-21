@@ -4,12 +4,12 @@
 
 #include "Character.h"
 #include "Sounds.h"
+class Controls;
 
 class MarioCharacter : public Character
 {
 private:
 	bool dead_mario;
-
 public:
 	MarioCharacter(SDL_Renderer* renderer, string imagePath, Vector2D start_position, LevelMaps* maps);
 	~MarioCharacter();
@@ -18,9 +18,8 @@ public:
 	virtual void Update(float deltaTime, SDL_Event e);
 
 	void MarioKeyboard(float deltatime, SDL_Event e);
-	//void MarioAnimation(float deltaTime, SDL_Event e, bool jump);
 	void MarioAnimation(float deltaTime, SDL_Event e);
-	bool deadMario(bool b =false);
+
 	void JumpSound(bool play);
 };
 

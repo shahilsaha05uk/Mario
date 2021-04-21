@@ -4,21 +4,23 @@ MainGame::MainGame()
 {
 	if (InitSDL())
 	{
+
 		_sounds = new Sounds();
 		_sounds->LoadMusic("Sounds/Mario.mp3");
 		PlayBackgroundMusic();
+
 		_menu = new MainMenu(g_renderer);
 		_menu->Render();
+		_gamescreen = new GameScreen(g_renderer);
 
-			game_screen_manager = new GameScreenManager(g_renderer, SCREEN_MENU);
-			g_old_time = SDL_GetTicks();
-			quit = false;
-			while (!quit)
-			{
-				Render();
-				quit = Update();
-			}
-
+		game_screen_manager = new GameScreenManager(g_renderer, SCREEN_MENU);
+		g_old_time = SDL_GetTicks();
+		quit = false;
+		while (!quit)
+		{
+			Render();
+			quit = Update();
+		}
 	}
 	CloseSDL();
 }
@@ -26,8 +28,12 @@ MainGame::~MainGame()
 {
 	_sounds = nullptr;
 	delete[] _sounds;
+
 	_menu = nullptr;
 	delete[] _menu;
+
+	game_screen_manager = nullptr;
+	delete[] game_screen_manager;
 }
 void MainGame::CloseSDL()
 {
@@ -43,6 +49,7 @@ void MainGame::CloseSDL()
 	IMG_Quit();
 	SDL_Quit();
 
+	
 }
 
 bool MainGame::InitSDL()
@@ -81,9 +88,6 @@ bool MainGame::InitSDL()
 			cout << "Window was not created. Error: " << SDL_GetError();
 			return false;
 		}
-		score = new HighScore(g_renderer, true);
-
-		//_score = new GameScreen(g_renderer);
 	}
 	return true;
 }
@@ -92,22 +96,30 @@ void MainGame::Render()
 	SDL_SetRenderDrawColor(g_renderer, 0x00, 0x00, 0x00, 0x00);
 	SDL_RenderClear(g_renderer);
 	game_screen_manager->Render();
-	SDL_RenderPresent(g_renderer);
 
+	SDL_RenderPresent(g_renderer);
 }
 bool MainGame::Update()
 {
 	Uint32 new_time = SDL_GetTicks();
 	SDL_PollEvent(&e);
-	trial(e);
-	health = game_screen_manager->trial();
-	if (health == 0)
+	game_screen_manager->Update((float)(new_time - g_old_time) / 1000.0f, e);
+	GameControl(e);
+
+
+
+	if (game_screen_manager->MariofetchHealth() == 0 || game_screen_manager->LuigifetchHealth() == 0)
 	{
-		_scores = game_screen_manager->Scores();
-		UpdateScoreFile(true);
-		cout << "Scores from main game: " << game_screen_manager->Scores();
+		game_screen_manager->ScoreUpdate();
 		game_screen_manager->ChangeScreen(SCREEN_GAMEOVER);
 
+		_sounds->LoadMusic("Sounds/GameOver.wav");
+		_sounds->Play(0);
+
+	}
+	else if(game_screen_manager->FetchPlayerPosition() == true)
+	{
+		game_screen_manager->ChangeScreen(SCREEN_LEVEL2);
 	}
 
 	switch (e.type)
@@ -118,12 +130,11 @@ bool MainGame::Update()
 		break;
 
 	}
-	game_screen_manager->Update((float)(new_time - g_old_time) / 1000.0f, e);
 	g_old_time = new_time;
 	return false;
 
 }
-void MainGame::trial(SDL_Event e)
+void MainGame::GameControl(SDL_Event e)
 {
 	int x = 0;
 	int y = 0;
@@ -135,22 +146,23 @@ void MainGame::trial(SDL_Event e)
 		switch (e.key.keysym.sym)
 		{
 		case SDLK_SPACE:
-			if (game_screen_manager->trialScreen() == SCREEN_GAMEOVER)
+			if (game_screen_manager->GetCurrentScreen() == SCREEN_GAMEOVER)
 			{
 				game_screen_manager->ChangeScreen(SCREEN_MENU);
+				break;
 			}
-		
 			break;
 
-		}
-	case SDL_KEYUP:
-		switch (e.key.keysym.sym)
-		{
-		case SDLK_ESCAPE:
+		case SDLK_r:
 			game_screen_manager->ChangeScreen(SCREEN_MENU);
 			break;
+		case SDLK_m:
+			_sounds->Pause();
+			break;
+		case SDLK_p:
+			_sounds->Resume();
+			break;
 		}
-
 
 	case SDL_MOUSEBUTTONDOWN:
 		x = e.button.x;
@@ -205,53 +217,14 @@ void MainGame::trial(SDL_Event e)
 			break;
 		}
 		break;
+
 	}
 }
-//void MainGame::StoreScore(bool b)
-//{
-//	int tempscore = 0;
-//	if (b == true)
-//	{
-//		tempscore += _score->ScoreRecord();
-//		cout << "Scores are: " << tempscore;
-//	}
-//
-//	outfile.open("Score.txt", ios::app);
-//	outfile << "Score is: " << tempscore << endl;
-//	outfile.close();
-//
-//	if (!outfile.is_open())
-//	{
-//		cout << "File successfully updated" << endl;
-//	}
-//}
 void MainGame::PlayBackgroundMusic()
 {
 	if (SDL_GetAudioStatus() == SDL_AUDIO_STOPPED)
 	{
-		//_sounds->Play(-1);
+		_sounds->Play(-1);
 	}
-}
 
-void MainGame::UpdateScoreFile(bool b)
-{
-	ofstream writefile;
-	if (b == true)
-	{
-		cout << "Scores are: " << _scores;
-		b = false;
-
-	}
-	writefile.open("Score.txt", ios::app);
-	if (_scores > 0)
-	{
-		writefile << "Score is: " << _scores << endl;
-	}
-	writefile.close();
-
-	if (!writefile.is_open())
-	{
-		cout << "File successfully updated" << endl;
-	}
-	writefile.close();
 }

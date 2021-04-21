@@ -3,7 +3,8 @@
 MarioCharacter::MarioCharacter(SDL_Renderer* renderer, string imagePath, Vector2D start_position, LevelMaps* maps) : Character(renderer, imagePath, start_position, maps)
 {
 	_jumpSound = new Sounds();
-	_jumpSound->LoadMusic("Sounds/Jump.ogg");
+	_jumpSound->LoadMusic("Sounds/Jump.wav");
+
 
 	m_single_sprite_h = m_texture->GetHeight();
 	m_single_sprite_w = m_texture->GetWidth() / 6;
@@ -16,7 +17,6 @@ MarioCharacter::~MarioCharacter()
 }
 void MarioCharacter::Render()
 {
-	//Character::Render();
 	int firstSprite = currentFrameCount * m_single_sprite_w;
 	
 	SDL_Rect firstFrame = { firstSprite,0, m_single_sprite_w, m_single_sprite_h };
@@ -34,6 +34,7 @@ void MarioCharacter::Render()
 void MarioCharacter::Update(float deltaTime, SDL_Event e)
 {
 	MarioKeyboard(deltaTime, e);
+
 	Character::Update(deltaTime, e);
 
 	MarioAnimation(deltaTime, e);
@@ -50,58 +51,54 @@ void MarioCharacter::JumpSound(bool play)
 }
 void MarioCharacter::MarioKeyboard(float deltatime, SDL_Event e)
 {
-	switch (e.type)
-	{
-	case SDL_KEYDOWN:
-		switch (e.key.keysym.sym)
-		{
-		case SDLK_LEFT:
-			m_moving_left = true;
-			break;
-		case SDLK_RIGHT:
-			m_moving_right = true;
-			break;
-		case SDLK_SPACE:
-			if (m_can_jump)
-			{
-				Jump();
-				JumpSound(true);
 
-			}
-			else
-			{
-				JumpSound(false);
-			}
-		}
-		break;
-	case SDL_KEYUP:
-		switch (e.key.keysym.sym)
+		switch (e.type)
 		{
-		case SDLK_LEFT:
-			m_moving_left = false;
-			break;
-		case SDLK_RIGHT:
-			m_moving_right = false;
-			break;
-		case SDLK_SPACE:
-			if (!m_can_jump)
+		case SDL_KEYDOWN:
+			switch (e.key.keysym.sym)
 			{
-				JumpSound(false);
+			case SDLK_LEFT:
+				m_moving_left = true;
+				break;
+			case SDLK_RIGHT:
+				m_moving_right = true;
+				break;
+			case SDLK_SPACE:
+				if (m_can_jump)
+				{
+					Jump();
+					JumpSound(true);
+				}
+				else
+				{
+					JumpSound(false);
+				}
 			}
-			else
+			break;
+		case SDL_KEYUP:
+			switch (e.key.keysym.sym)
 			{
-				JumpSound(false);
+			case SDLK_LEFT:
+				m_moving_left = false;
+				break;
+			case SDLK_RIGHT:
+				m_moving_right = false;
+				break;
+			case SDLK_SPACE:
+				if (!m_can_jump)
+				{
+					JumpSound(false);
+				}
+				else
+				{
+					JumpSound(false);
+				}
 			}
+		default:
+			break;
 		}
-	default:
-		break;
-	}
+}
 
-}
-bool MarioCharacter::deadMario(bool b)
-{
-	return b;
-}
 
 void MarioCharacter::MarioAnimation(float deltaTime, SDL_Event e)
 {
@@ -110,11 +107,8 @@ void MarioCharacter::MarioAnimation(float deltaTime, SDL_Event e)
 	{
 		if (mtimer > ANIMATIONDELAY)
 		{
-
 			currentFrameCount++;
 			mtimer = 0;
-
-			cout << currentFrameCount << endl;
 
 			if (currentFrameCount > 3)
 			{

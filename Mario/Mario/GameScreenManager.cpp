@@ -7,9 +7,10 @@
 #include "GameOver.h"
 
 //#include "Character.h"
-GameScreenManager::GameScreenManager(SDL_Renderer* renderer, SCREENS startScreen): GameScreen(renderer)
+GameScreenManager::GameScreenManager(SDL_Renderer* renderer, SCREENS startScreen)
 {
 	m_renderer = renderer;
+
 	ChangeScreen(startScreen);
 
 }
@@ -18,15 +19,22 @@ GameScreenManager::~GameScreenManager()
 	m_renderer = nullptr;
 	delete m_current_screen;
 }
+GameScreenManager::GameScreenManager(SDL_Renderer* renderer)
+{
+	m_renderer = renderer;
+	string path = "Fonts/BASTION_.TTF";
+	fontLoad[0] = TTF_OpenFont(path.c_str(), SMALLTEXTSIZE);
+	fontLoad[1] = TTF_OpenFont(path.c_str(), MEDIUMTEXTSIZE);
+	fontLoad[2] = TTF_OpenFont(path.c_str(), LARGETEXTSIZE);
+}
 void GameScreenManager::Render()
 {
 	m_current_screen->Render();
-
 }
 void GameScreenManager::Update(float deltaTime, SDL_Event e)
 {
-	//trial();
 	m_current_screen->Update(deltaTime,e);
+
 }
 void GameScreenManager::ChangeScreen(SCREENS new_screen)
 {
@@ -76,13 +84,22 @@ void GameScreenManager::ChangeScreen(SCREENS new_screen)
 	m_screen = new_screen;
 }
 
-int GameScreenManager::trial()
+
+int GameScreenManager::LuigifetchHealth()
 {
-	return m_current_screen->luigi_health;
+	return m_current_screen->luigihealthValue;
+}
+int GameScreenManager::MariofetchHealth()
+{
+	return m_current_screen->mariohealthValue;
 }
 
-int GameScreenManager::Scores()
+void GameScreenManager::ScoreUpdate()
 {
-	score = m_current_screen->ScoreRecord();
-	return score;
+	m_current_screen->WriteToScoreFile();
 }
+bool GameScreenManager::FetchPlayerPosition()
+{
+	return m_current_screen->playerPositionStatus;
+}
+

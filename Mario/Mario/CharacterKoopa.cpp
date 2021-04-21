@@ -7,8 +7,9 @@ CharacterKoopa::CharacterKoopa(SDL_Renderer* renderer, string imagePath, Vector2
 	m_movement_speed = movement_speed;
 	m_injured = false;
 
-	m_single_sprite_w = m_texture->GetWidth() / 2;
 	m_single_sprite_h = m_texture->GetHeight();
+	m_single_sprite_w = m_texture->GetWidth() / 11;
+	TotalframesCount = 11;
 }
 CharacterKoopa::~CharacterKoopa()
 {
@@ -16,21 +17,19 @@ CharacterKoopa::~CharacterKoopa()
 }
 void CharacterKoopa::Render()
 {
-	int left = 0.0f;
-	if (m_injured)
-	{
-		left = m_single_sprite_w;
-	}
-	SDL_Rect first_frame = { left,0,m_single_sprite_w,m_single_sprite_h };
-	SDL_Rect draw_pos = { (int)(m_position.x),(int)(m_position.y),m_single_sprite_w, m_single_sprite_h };
+
+	int firstSprite = currentFrameCount * m_single_sprite_w;
+
+	SDL_Rect firstFrame = { firstSprite,0, m_single_sprite_w, m_single_sprite_h };
+	SDL_Rect worldDrawPosition = { (int)m_position.x , (int)m_position.y , m_single_sprite_w, m_single_sprite_h };
 
 	if (m_facing_direction == FACING_RIGHT)
 	{
-		m_texture->Render(first_frame, draw_pos, SDL_FLIP_NONE);
+		m_texture->Render(firstFrame, worldDrawPosition, SDL_FLIP_NONE);
 	}
 	else
 	{
-		m_texture->Render(first_frame, draw_pos, SDL_FLIP_HORIZONTAL);
+		m_texture->Render(firstFrame, worldDrawPosition, SDL_FLIP_HORIZONTAL);
 	}
 }
 void CharacterKoopa::Update(float deltaTime, SDL_Event e)
@@ -60,8 +59,10 @@ void CharacterKoopa::Update(float deltaTime, SDL_Event e)
 			FlipRightWayUp();
 		}
 	}
-	Character::Update(deltaTime, e);
 
+
+	Character::Update(deltaTime, e);
+	KoopaAnimation(deltaTime, e);
 }
 
 void CharacterKoopa::TakeDamage()
@@ -70,6 +71,40 @@ void CharacterKoopa::TakeDamage()
 	m_injured_time = INJURED_TIME;
 
 		Jump();
+}
+void CharacterKoopa::KoopaAnimation(float deltaTime, SDL_Event e)
+{
+	mtimer += deltaTime;
+	if (m_moving_right || m_moving_left)
+	{
+		if (mtimer > ANIMATIONDELAY)
+		{
+
+			currentFrameCount++;
+			mtimer = 0;
+
+			if (currentFrameCount >= 5)
+			{
+				currentFrameCount = 0;
+			}
+		}
+	}
+	else if (m_injured == true)
+	{
+		setframe = 6;
+
+		if (mtimer > ANIMATIONDELAY)
+		{
+
+			currentFrameCount++;
+			mtimer = 0;
+
+			if (currentFrameCount >= 11)
+			{
+				currentFrameCount = setframe;
+			}
+		}
+	}
 }
 void CharacterKoopa::FlipRightWayUp()
 {

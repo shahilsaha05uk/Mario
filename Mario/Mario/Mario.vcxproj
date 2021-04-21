@@ -88,13 +88,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\SDL2\SDL\include;X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\SDL2\SDL\image_include;X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\SDL2\SDL\mixer_include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(PROJECTDIR)SDL2\SDL\include;$(PROJECTDIR)SDL2\SDL\image_include;$(PROJECTDIR)SDL2\SDL\mixer_include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\SDL2</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(PROJECTDIR)SDL2\SDL</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -105,15 +105,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\SDL2\SDL\include;X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\SDL2\SDL\image_include;X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\SDL2\SDL\mixer_include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(PROJECTDIR)SDL2\SDL\include;$(PROJECTDIR)SDL2\SDL\image_include;$(PROJECTDIR)SDL2\SDL\mixer_include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>X:\BACKUP REPOS\Mario\Backup Mario\Mario_Repo\Mario_Repo\Mario\Mario\SDL2</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(PROJECTDIR)SDL2\SDL</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -159,6 +159,7 @@
     <ClCompile Include="GameScreenLevel1.cpp" />
     <ClCompile Include="GameScreenLevel2.cpp" />
     <ClCompile Include="GameScreenManager.cpp" />
+    <ClCompile Include="HealthBar.cpp" />
     <ClCompile Include="HighScore.cpp" />
     <ClCompile Include="LevelMaps.cpp" />
     <ClCompile Include="LuigiCharacter.cpp" />
@@ -193,6 +194,7 @@
     <ClInclude Include="GameScreenLevel1.h" />
     <ClInclude Include="GameScreenLevel2.h" />
     <ClInclude Include="GameScreenManager.h" />
+    <ClInclude Include="HealthBar.h" />
     <ClInclude Include="HighScore.h" />
     <ClInclude Include="LevelMaps.h" />
     <ClInclude Include="LuigiCharacter.h" />

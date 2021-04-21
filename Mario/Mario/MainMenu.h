@@ -9,11 +9,7 @@ class MainMenu : GameScreen
 {
 private:
 	Texture2D* menuTexture;
-	GameScreenManager* game_manger;
-	//HighScore* score;
 	int screen;
-	//Text Display variables
-
 	bool quit;
 
 public:
@@ -27,6 +23,9 @@ public:
 	void Load();
 	virtual void Render();
 	virtual void Update(float deltaTime, SDL_Event e);
+
+
+
 
 	SDL_Rect* MainMenuRect[4];
 	Text* _menuText[4];

@@ -10,7 +10,6 @@ private:
 	bool m_injured;
 	float m_injured_time;
 	float m_movement_speed;
-
 	void FlipRightWayUp();
 
 public:
@@ -22,6 +21,8 @@ public:
 
 	void TakeDamage();
 	bool GetInjured() { return m_injured; }
+
+	void KoopaAnimation(float deltaTime, SDL_Event e);
 };
 
 #endif // !_CHARACTERKOOPA

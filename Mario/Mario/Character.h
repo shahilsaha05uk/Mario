@@ -5,14 +5,6 @@
 
 using namespace std;
 
-//#include "SDL.h"
-//#include <iostream>
-//#include "Commons.h"
-//#include "constants.h"
-//#include "Texture2D.h"
-//#include <string>
-//#include "LevelMaps.h"
-//#include "Sounds.h"
 
 #include "SDL.h"
 #include <iostream>
@@ -23,8 +15,11 @@ using namespace std;
 #include "Constants.h"
 #include "Sounds.h"
 #include "Text.h"
+
+
 class Texture2D;
 class CharacterKoopa;
+class GameScreen;
 class Character
 {
 private:
@@ -35,23 +30,21 @@ protected:
 	Vector2D m_position;
 	Texture2D* m_texture;
 	FACING m_facing_direction;
+	GameScreen* _screen;
 	LevelMaps* m_current_level_map;
 
+	//collision
+	float m_collision_radius;
+
+	bool m_alive;
+
+	//movement members
 	bool m_moving_right;
 	bool m_moving_left;
 
 	bool m_jumping;
 	bool m_can_jump;
 	float m_jump_force;
-
-	float m_collision_radius;
-
-	bool m_alive;
-
-	//virtual void MoveLeft(float deltaTime);
-	//virtual void MoveRight(float deltaTime);
-	virtual void AddGravity(float deltaTime);
-	virtual void Jump();
 
 	//sprite members
 	float m_single_sprite_w;
@@ -62,14 +55,17 @@ protected:
 	int currentFrameCount;
 	float mtimer;
 	const float fixedtimer = 10.0f;
+	int setframe;
 
 	//Sounds members
 	Sounds* _jumpSound;
 
-
 public:
 	Character(SDL_Renderer* renderer, string imagepath, Vector2D start_position, LevelMaps* maps);
 	~Character();
+
+	Character();
+
 	virtual void Update(float deltaTime, SDL_Event e);
 	virtual void Render();
 
@@ -87,11 +83,9 @@ public:
 
 	virtual void MoveLeft(float deltaTime);
 	virtual void MoveRight(float deltaTime);
+	virtual void AddGravity(float deltaTime);
+	virtual void Jump();
 
-
-
-	//virtual void AddGravity(float deltaTime);
-	//virtual void Jump();
 };
 
 #endif // !_CHARACTER

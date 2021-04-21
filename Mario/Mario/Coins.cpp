@@ -20,7 +20,6 @@ void Coins::Render()
 	SDL_Rect first_frame = { left,0,m_single_sprite_w,m_single_sprite_h };
 	SDL_Rect draw_pos = { (int)(m_position.x),(int)(m_position.y),m_single_sprite_w, m_single_sprite_h };
 	m_texture->Render(first_frame, draw_pos, SDL_FLIP_NONE);
-
 }
 void Coins::Update(float deltaTime, SDL_Event e)
 {
@@ -35,8 +34,6 @@ void Coins::Update(float deltaTime, SDL_Event e)
 			currentFrame = 0;
 		}
 	}
-	//Character::Update(deltaTime, e);
-
 }
 
 void Coins::CoinSound(bool play)

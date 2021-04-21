@@ -3,10 +3,11 @@
 #include "Texture2D.h"
 #include "Collision.h"
 
-
 using namespace std;
 GameScreenLevel1::GameScreenLevel1(SDL_Renderer* renderer) : GameScreen(renderer)
 {
+	game_manager = new GameScreenManager(m_renderer);
+
 	SetLevelMap();
 	SetUpLevel();
 	m_level_map = nullptr;
@@ -28,14 +29,11 @@ GameScreenLevel1::~GameScreenLevel1()
 
 	m_koopas.clear();
 
-	m_coins = nullptr;
-	delete[] m_coins;
+	_coins.clear();
 
 	_text = nullptr;
 	delete[] _text;
 
-	_luigi_healthText = nullptr;
-	delete[] _luigi_healthText;
 }
 
 void GameScreenLevel1::Render()
@@ -46,57 +44,33 @@ void GameScreenLevel1::Render()
 	_text->Render(*_temprect, m_renderer);
 
 
-	marioHealthrect = new SDL_Rect();
-	marioHealthrect->h = 30.0f; marioHealthrect->w = 100.0f;
-	marioHealthrect->x = 10.0f; marioHealthrect->y = 10.0f;
-
-	luigiHealthrect = new SDL_Rect();
-	luigiHealthrect->h = 30.0f; luigiHealthrect->w = 100.0f;
-	luigiHealthrect->x = 400.0f; luigiHealthrect->y = 10.0f;
-
-
 	m_background_texture->Render(Vector2D(0, m_background_yPos), SDL_FLIP_NONE);
+	_luigi->Render();
+	_mario->Render();
+	m_pow_block->Render();
 	for (int i = 0; i < m_koopas.size(); i++)
 	{
 		m_koopas.at(i)->Render();
 	}
-	_luigi->Render();
-	_mario->Render();
-	m_pow_block->Render();
+
+	health[0]->Render();
+	health[1]->Render();
+
+
 	for (int i = 0; i < _coins.size(); i++)
 	{
 		_coins.at(i)->Render();
-	}
-
-
-		//_mario_healthText->Render(*marioHealthrect, m_renderer);
-	if (_luigi->GetAlive() != false)
-	{
-		_luigi_healthText->Render(*luigiHealthrect, m_renderer);
 	}
 }
 
 void GameScreenLevel1::Update(float deltaTime, SDL_Event e)
 {
-	//scoretext->Update(e, deltaTime);
-
-
-	if (_mario->GetAlive() != false)
-	{
-		_mario_healthText->Update(to_string(mario_health));
-	}
-	if (_luigi->GetAlive() != false)
-	{
-		_luigi_healthText->Update(to_string(luigi_health));
-	}
-
-
-	UpdateEnemies(deltaTime, e);
 	_mario->Update(deltaTime, e);
 	_luigi->Update(deltaTime, e);
 	UpdatePOWBlock();
 	UpdateCoins(deltaTime, e);
-
+	UpdateEnemies(deltaTime, e);
+	UpdatePlayers();
 
 	if (Collision::Instance()->Circle(_mario, _luigi))
 	{
@@ -126,15 +100,12 @@ void GameScreenLevel1::Update(float deltaTime, SDL_Event e)
 //Setup
 bool GameScreenLevel1::SetUpLevel()
 {
-	_text = new Text(m_renderer, "Fonts/BASTION_.TTF", "Level 1", MEDIUMTEXTSIZE, { 225,225,225,225 });
-	LoadScores();
 
+	_text = new Text(m_renderer, game_manager->fontLoad[1], "Level 1", { 225,225,225,225 });
+	_sound = new Sounds();
+	_sound->LoadMusic("Sounds/HealthDecrease.ogg");
 
-	_mario_healthText = new Text(m_renderer, "Fonts/BASTION_.TTF", to_string(mario_health), SMALLTEXTSIZE);
-
-	_luigi_healthText = new Text(m_renderer, "Fonts/BASTION_.TTF", to_string(luigi_health), SMALLTEXTSIZE);
-
-	_mario = new MarioCharacter(m_renderer, "Images/Sprite/Mario.png", Vector2D(64, 353), m_level_map);
+	_mario = new MarioCharacter(m_renderer, "Images/Sprite/Mario.png", Vector2D(64, 341), m_level_map);
 	_luigi = new LuigiCharacter(m_renderer, "Images/Sprite/Luigi.png", Vector2D(64, 240), m_level_map);
 	
 	CreateKoopa(Vector2D(256, 360), FACING_RIGHT, KOOPA_SPEED);
@@ -145,6 +116,8 @@ bool GameScreenLevel1::SetUpLevel()
 	CoinCreator(Vector2D(380, 350));
 	CoinCreator(Vector2D(100, 240));
 
+	health[0] = new HealthBar(m_renderer, Vector2D(30, 400), m_level_map, "Images/Sprite/HealthBarMario.png");
+	health[1] = new HealthBar(m_renderer, Vector2D(400, 400), m_level_map, "Images/Sprite/HealthBarLuigi.png");
 	m_screenshake = false;
 	m_background_yPos = 0.0f;
 
@@ -154,8 +127,6 @@ bool GameScreenLevel1::SetUpLevel()
 		cout << "Failed to load background texture!" << endl;
 		return false;
 	}
-
-
 
 }
 void GameScreenLevel1::SetLevelMap()
@@ -176,7 +147,6 @@ void GameScreenLevel1::SetLevelMap()
 			infile >> tempNum;
 			map[i][j] = tempNum;
 		}
-		cout << endl;
 	}
 	infile.close();
 
@@ -207,12 +177,19 @@ void GameScreenLevel1::UpdateEnemies(float deltaTime, SDL_Event e)
 				{
 					m_koopas.at(i)->TakeDamage();
 				}
-				else
+				else if (!_mario->Isjumping())
 				{
-					MarioHealth();
-				}
-			}
+					if (m_koopas.at(i)->GetInjured() == true)
+					{
 
+					}
+					else
+					{
+						mariohealthValue = health[0]->Update(deltaTime, _mario);
+					}
+				}
+
+			}
 			//luigi
 			else if (_luigi->GetCollisionBox().x + _luigi->GetCollisionBox().width >= m_koopas.at(i)->GetCollisionBox().x && _luigi->GetCollisionBox().x <= m_koopas.at(i)->GetCollisionBox().x && _luigi->GetCollisionBox().y + _luigi->GetCollisionBox().height >= m_koopas.at(i)->GetCollisionBox().y && _luigi->GetCollisionBox().y <= m_koopas.at(i)->GetCollisionBox().y)
 			{
@@ -220,9 +197,16 @@ void GameScreenLevel1::UpdateEnemies(float deltaTime, SDL_Event e)
 				{
 					m_koopas.at(i)->TakeDamage();
 				}
-				else
+				else if (!_luigi->Isjumping())
 				{
-					LuigiHealth();
+					if (m_koopas.at(i)->GetInjured() == true)
+					{
+
+					}
+					else
+					{
+						luigihealthValue = health[1]->Update(deltaTime, _luigi);
+					}
 				}
 			}
 
@@ -302,16 +286,19 @@ void GameScreenLevel1::UpdateCoins(float deltaTime, SDL_Event e)
 		}
 	}
 }
-
-void GameScreenLevel1::MarioDead()
+void GameScreenLevel1::UpdatePlayers()
 {
-
+	if (_mario->GetPosition().x >= 415 || _luigi->GetPosition().x >= 415 && _mario->GetPosition().y >= 340 && _luigi->GetPosition().y >= 340)
+	{
+		playerPositionStatus = true;
+	}
 }
+
 //Create
 void GameScreenLevel1::CreateKoopa(Vector2D position, FACING direction, float speed)
 {
 	CharacterKoopa* _koopa;
-	_koopa = new CharacterKoopa(m_renderer, "Images/Koopa.png", position, m_level_map, direction, speed);
+	_koopa = new CharacterKoopa(m_renderer, "Images/Sprite/KoopaSprite.png", position, m_level_map, direction, speed);
 	m_koopas.push_back(_koopa);
 }
 void GameScreenLevel1::CoinCreator(Vector2D position)
@@ -322,7 +309,6 @@ void GameScreenLevel1::CoinCreator(Vector2D position)
 }
 
 //Extras
-
 void GameScreenLevel1::DoScreenShake()
 {
 	m_screenshake = true;

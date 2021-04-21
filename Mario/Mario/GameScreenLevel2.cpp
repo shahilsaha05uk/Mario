@@ -6,6 +6,8 @@
 using namespace std;
 GameScreenLevel2::GameScreenLevel2(SDL_Renderer* renderer) : GameScreen(renderer)
 {
+	game_manager = new GameScreenManager(m_renderer);
+
 	SetLevelMap();
 	SetUpLevel();
 	m_level_map = nullptr;
@@ -25,10 +27,9 @@ GameScreenLevel2::~GameScreenLevel2()
 	m_pow_block = nullptr;
 	delete[] m_pow_block;
 
-	m_koopas.clear();
+	m_goomba.clear();
 
-	m_coins = nullptr;
-	delete[] m_coins;
+	_coins.clear();
 
 	_text = nullptr;
 	delete[] _text;
@@ -37,32 +38,39 @@ GameScreenLevel2::~GameScreenLevel2()
 void GameScreenLevel2::Render()
 {
 	_temprect = new SDL_Rect();
-	_temprect->x = 225; _temprect->y = 80;
+	_temprect->x = 225; _temprect->y = 120;
 	_temprect->w = 80; _temprect->h = 80;
-	_text->Render(*_temprect, m_renderer);
 
 	m_background_texture->Render(Vector2D(0, m_background_yPos), SDL_FLIP_NONE);
-		for (int i = 0; i < m_goomba.size(); i++)
+
+	for (int i = 0; i < m_goomba.size(); i++)
 	{
 		m_goomba.at(i)->Render();
 	}
+	_text->Render(*_temprect, m_renderer);
 
 	_luigi->Render();
+	
 	_mario->Render();
+
 	for (int i = 0; i < _coins.size(); i++)
 	{
 		_coins.at(i)->Render();
 	}
+
+	health[0]->Render();
+	health[1]->Render();
+
 }
 void GameScreenLevel2::Update(float deltaTime, SDL_Event e)
 {
 
-	//_text->Update(e, deltaTime);
 	UpdateGoomba(deltaTime, e);
 
 	_mario->Update(deltaTime, e);
 	_luigi->Update(deltaTime, e);
 	UpdateCoins(deltaTime, e);
+
 
 	if (Collision::Instance()->Circle(_mario, _luigi))
 	{
@@ -119,16 +127,22 @@ void GameScreenLevel2::SetLevelMap()
 }
 bool GameScreenLevel2::SetUpLevel()
 {
-	_text = new Text(m_renderer, "Fonts/BASTION_.TTF", "Level 2", MEDIUMTEXTSIZE, { 225,225,225,225 });
+	_text = new Text(m_renderer, game_manager->fontLoad[1], "Level 2", { 250,12,1,200 });
 
 	_mario = new MarioCharacter(m_renderer, "Images/Sprite/Mario.png", Vector2D(64, 20), m_level_map);
-	_luigi = new LuigiCharacter(m_renderer, "Images/Sprite/Luigi.png", Vector2D(412, 20), m_level_map);
+	_luigi = new LuigiCharacter(m_renderer, "Images/Sprite/Luigi.png", Vector2D(72, 20), m_level_map);
 
-	CreateGoomba(Vector2D(300, 360), FACING_RIGHT, GOOMBA_SPEED);
-	CreateGoomba(Vector2D(412, 80), FACING_LEFT, GOOMBA_SPEED);
+	health[0] = new HealthBar(m_renderer, Vector2D(60, 380), m_level_map, "Images/Sprite/HealthBarMario.png");
+	health[1] = new HealthBar(m_renderer, Vector2D(300, 380), m_level_map, "Images/Sprite/HealthBarLuigi.png");
 
-	//CoinCreator(Vector2D(325, 350));
-	//CoinCreator(Vector2D(90, 240));
+
+
+	for (int i = 0; i < 6; i++)
+	{
+		CoinCreator(Vector2D(i* 60, 60));
+	}
+	CreateGoomba(Vector2D(400, 360), FACING_LEFT, GOOMBA_SPEED);
+	CreateGoomba(Vector2D(60, 360), FACING_RIGHT, GOOMBA_SPEED);
 
 	m_screenshake = false;
 	m_background_yPos = 0.0f;
@@ -182,10 +196,19 @@ void GameScreenLevel2::UpdateCoins(float deltaTime, SDL_Event e)
 
 			if (Collision::Instance()->Circle(_mario, _coins.at(i)))
 			{
+				ScoreRecord(10);
 				_coins.at(i)->CoinSound(true);
 				cout << "Coint at " << i << " collided" << endl;
 				_coins.erase(_coins.begin() + i);
 			}
+			else if (Collision::Instance()->Circle(_luigi, _coins.at(i)))
+			{
+				ScoreRecord(10);
+				_coins.at(i)->CoinSound(true);
+				cout << "Coint at " << i << " collided" << endl;
+				_coins.erase(_coins.begin() + i);
+			}
+
 		}
 	}
 }
@@ -202,33 +225,48 @@ void GameScreenLevel2::UpdateGoomba(float deltaTime, SDL_Event e)
 			{
 				//cout << "Ignore Collisions" << endl;
 			}
-			else
+			else if (_mario->GetCollisionBox().x + _mario->GetCollisionBox().width >= m_goomba.at(i)->GetCollisionBox().x && _mario->GetCollisionBox().x <= m_goomba.at(i)->GetCollisionBox().x && _mario->GetCollisionBox().y + _mario->GetCollisionBox().height >= m_goomba.at(i)->GetCollisionBox().y && _mario->GetCollisionBox().y <= m_goomba.at(i)->GetCollisionBox().y)
 			{
-				if (Collision::Instance()->Circle(_mario, m_goomba.at(i)))
+
+				if (_mario->Isjumping())
 				{
-					_mario->SetAlive(false);
+					m_goomba.at(i)->TakeDamage();
+				}
+				else if (!_mario->Isjumping())
+				{
+					if (m_goomba.at(i)->GetInjured() == true)
+					{
+
+					}
+					else
+					{
+						mariohealthValue = health[0]->Update(deltaTime, _mario);
+					}
+				}
+
+			}
+			//luigi
+			else if (_luigi->GetCollisionBox().x + _luigi->GetCollisionBox().width >= m_goomba.at(i)->GetCollisionBox().x && _luigi->GetCollisionBox().x <= m_goomba.at(i)->GetCollisionBox().x && _luigi->GetCollisionBox().y + _luigi->GetCollisionBox().height >= m_goomba.at(i)->GetCollisionBox().y && _luigi->GetCollisionBox().y <= m_goomba.at(i)->GetCollisionBox().y)
+			{
+				if (_luigi->Isjumping())
+				{
+					m_goomba.at(i)->TakeDamage();
+				}
+				else if (!_luigi->Isjumping())
+				{
+					if (m_goomba.at(i)->GetInjured() == true)
+					{
+
+					}
+					else
+					{
+						luigihealthValue = health[1]->Update(deltaTime, _luigi);
+					}
 				}
 			}
-
-
-
-
 
 			//	Moving Koopas
 			if (i == 1)
-			{
-				if (m_goomba.at(i)->GetPosition().x <= 128)
-				{
-					m_goomba.at(i)->Update(deltaTime, e);
-					m_goomba.at(i)->MoveRight(deltaTime);
-				}
-				if (m_goomba.at(i)->GetPosition().x + m_goomba.at(i)->GetCollisionBox().width >= 380)
-				{
-					m_goomba.at(i)->Update(deltaTime, e);
-					m_goomba.at(i)->MoveLeft(deltaTime);
-				}
-			}
-			else
 			{
 				if (m_goomba.at(i)->GetPosition().x <= 80)
 				{
@@ -239,6 +277,22 @@ void GameScreenLevel2::UpdateGoomba(float deltaTime, SDL_Event e)
 				{
 					m_goomba.at(i)->Update(deltaTime, e);
 					m_goomba.at(i)->MoveLeft(deltaTime);
+				}
+			}
+			else
+			{
+				if (m_goomba.at(i)->GetPosition().x <= 80 || m_goomba.at(i)->GetPosition().x + m_goomba.at(i)->GetCollisionBox().width >= 500)
+				{
+					//m_goomba.at(i)->Update(deltaTime, e);
+					//m_goomba.at(i)->MoveRight(deltaTime);
+					m_goomba.erase(m_goomba.begin() + i);
+
+					if (m_goomba.size() <= 0)
+					{
+						SetLevelMap();
+						CreateGoomba(Vector2D(400, 360), FACING_LEFT, GOOMBA_SPEED);
+						CreateGoomba(Vector2D(60, 360), FACING_RIGHT, GOOMBA_SPEED);
+					}
 				}
 			}
 		}
